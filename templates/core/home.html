@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ site_profile.name }}的个人技术平台{% endblock %}
+
+{% block content %}
+<section class="hero-section d-flex align-items-center">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8">
+                <p class="eyebrow mb-3">PYTHON · DJANGO · SOFTWARE ENGINEERING</p>
+                <h1 class="display-2 fw-bold mb-3">{{ site_profile.name }}</h1>
+                <p class="lead building-message mb-3">{{ site_profile.role }}</p>
+                <p class="fs-5 text-secondary-emphasis mb-4">{{ site_profile.direction }}</p>
+                <p class="profile-introduction mb-4">{{ site_profile.introduction }}</p>
+                <p class="mb-4">{{ site_profile.career_goal }}</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a class="btn btn-info" href="{% url 'projects:project_list' %}">查看项目</a>
+                    <a class="btn btn-outline-light" href="{% url 'core:about' %}">了解更多</a>
+                    <a
+                        class="btn btn-outline-light"
+                        href="{{ site_profile.github_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >GitHub（待填写）</a>
+                    <a class="btn btn-outline-light" href="mailto:{{ site_profile.email }}">联系我（待填写）</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="home-section py-5" aria-labelledby="recent-articles-title">
+    <div class="container py-lg-4">
+        <div class="section-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <p class="eyebrow mb-2">RECENT WRITING</p>
+                <h2 id="recent-articles-title" class="display-6 fw-bold mb-0">最近文章</h2>
+            </div>
+            <a class="section-link" href="{% url 'blog:article_list' %}">查看全部文章 →</a>
+        </div>
+        {% if recent_articles %}
+            <div class="row g-4">
+                {% for article in recent_articles %}
+                    <div class="col-md-6 col-xl-4">
+                        <article class="content-card p-4 h-100">
+                            <time class="article-date" datetime="{{ article.published_at|date:'c' }}">
+                                {{ article.published_at|date:"Y年n月j日" }}
+                            </time>
+                            <h3 class="h4 mt-2 mb-3">
+                                <a class="card-title-link" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                            </h3>
+                            <p class="text-secondary-emphasis mb-0">{{ article.summary }}</p>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state p-4">暂时还没有已发布的文章，欢迎稍后再来。</div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="home-section home-section-alt py-5" aria-labelledby="featured-projects-title">
+    <div class="container py-lg-4">
+        <div class="section-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <p class="eyebrow mb-2">FEATURED WORK</p>
+                <h2 id="featured-projects-title" class="display-6 fw-bold mb-0">精选项目</h2>
+            </div>
+            <a class="section-link" href="{% url 'projects:project_list' %}">查看全部项目 →</a>
+        </div>
+        {% if featured_projects %}
+            <div class="row g-4">
+                {% for project in featured_projects %}
+                    <div class="col-md-6 col-xl-4">
+                        <article class="content-card p-4 h-100">
+                            <span class="status-badge">{{ project.get_status_display }}</span>
+                            <h3 class="h4 mt-3 mb-3">
+                                <a class="card-title-link" href="{{ project.get_absolute_url }}">{{ project.title }}</a>
+                            </h3>
+                            <p class="text-secondary-emphasis">{{ project.summary }}</p>
+                            <p class="tech-stack mb-0">{{ project.tech_stack }}</p>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state p-4">暂时还没有精选项目，项目完成后会在这里展示。</div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

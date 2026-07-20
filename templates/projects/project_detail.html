@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} | 个人技术平台{% endblock %}
+
+{% block content %}
+<article class="content-section py-5">
+    <div class="container py-lg-4">
+        <div class="article-detail mx-auto">
+            <a class="back-link d-inline-block mb-4" href="{% url 'projects:project_list' %}">← 返回项目列表</a>
+            <header class="mb-5">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="status-badge">{{ project.get_status_display }}</span>
+                    {% if project.featured %}<span class="featured-badge">精选项目</span>{% endif %}
+                </div>
+                <h1 class="display-5 fw-bold mb-3">{{ project.title }}</h1>
+                <p class="lead text-secondary-emphasis mb-3">{{ project.summary }}</p>
+                <p class="tech-stack mb-0"><strong>技术栈：</strong>{{ project.tech_stack }}</p>
+            </header>
+
+            <div class="article-content mb-5">{{ project.description|linebreaks }}</div>
+
+            {% if project.github_url or project.demo_url %}
+                <div class="d-flex flex-wrap gap-3 mb-5">
+                    {% if project.github_url %}
+                        <a
+                            class="btn btn-outline-info"
+                            href="{{ project.github_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >查看GitHub</a>
+                    {% endif %}
+                    {% if project.demo_url %}
+                        <a
+                            class="btn btn-info"
+                            href="{{ project.demo_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >在线演示</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <p class="article-date mb-0">创建于 {{ project.created_at|date:"Y年n月j日" }} · 更新于 {{ project.updated_at|date:"Y年n月j日" }}</p>
+        </div>
+    </div>
+</article>
+{% endblock %}

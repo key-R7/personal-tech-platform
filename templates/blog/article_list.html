@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}技术文章 | 个人技术平台{% endblock %}
+
+{% block content %}
+<section class="content-section py-5">
+    <div class="container py-lg-4">
+        <div class="mb-4">
+            <p class="eyebrow mb-2">ARTICLES</p>
+            <h1 class="display-5 fw-bold mb-3">技术文章</h1>
+            <p class="text-secondary-emphasis mb-0">记录编程学习、项目实践与软件工程思考。</p>
+        </div>
+
+        <form class="filter-panel p-4 mb-4" method="get" action="{% url 'blog:article_list' %}">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-5">
+                    <label class="form-label" for="article-search">搜索标题或摘要</label>
+                    <input
+                        class="form-control"
+                        id="article-search"
+                        name="q"
+                        type="search"
+                        value="{{ query }}"
+                        placeholder="例如：Django"
+                    >
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label class="form-label" for="category-filter">分类</label>
+                    <select class="form-select" id="category-filter" name="category">
+                        <option value="">全部分类</option>
+                        {% for category in categories %}
+                            <option value="{{ category.slug }}"{% if current_category == category %} selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label class="form-label" for="tag-filter">标签</label>
+                    <select class="form-select" id="tag-filter" name="tag">
+                        <option value="">全部标签</option>
+                        {% for tag in tags %}
+                            <option value="{{ tag.slug }}"{% if current_tag == tag %} selected{% endif %}>{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-2 d-flex gap-2">
+                    <button class="btn btn-info flex-grow-1" type="submit">筛选</button>
+                    <a class="btn btn-outline-light" href="{% url 'blog:article_list' %}">清除</a>
+                </div>
+            </div>
+        </form>
+
+        {% if query or current_category or current_tag %}
+            <div class="active-filters d-flex flex-wrap gap-2 mb-4" aria-label="当前筛选条件">
+                {% if query %}<span>关键词：{{ query }}</span>{% endif %}
+                {% if current_category %}<span>分类：{{ current_category.name }}</span>{% endif %}
+                {% if current_tag %}<span>标签：{{ current_tag.name }}</span>{% endif %}
+            </div>
+        {% endif %}
+
+        {% if articles %}
+            <div class="row g-4">
+                {% for article in articles %}
+                    <div class="col-12">
+                        <article class="article-card p-4 p-lg-5 h-100">
+                            <time class="article-date" datetime="{{ article.published_at|date:'c' }}">
+                                {{ article.published_at|date:"Y年n月j日" }}
+                            </time>
+                            <h2 class="h3 mt-2 mb-3">
+                                <a class="article-title-link" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                            </h2>
+                            <p class="text-secondary-emphasis">{{ article.summary }}</p>
+                            <div class="article-taxonomy d-flex flex-wrap align-items-center gap-2">
+                                {% if article.category %}
+                                    <a class="taxonomy-link" href="{% url 'blog:article_list' %}?category={{ article.category.slug|urlencode }}">分类：{{ article.category.name }}</a>
+                                {% endif %}
+                                {% for tag in article.tags.all %}
+                                    <a class="taxonomy-link" href="{% url 'blog:article_list' %}?tag={{ tag.slug|urlencode }}">#{{ tag.name }}</a>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state p-5 text-center">
+                {% if query or current_category or current_tag %}
+                    <h2 class="h4">没有找到符合条件的文章</h2>
+                    <p class="text-secondary-emphasis mb-0">可以调整关键词或清除筛选条件后重试。</p>
+                {% else %}
+                    <h2 class="h4">暂时还没有已发布的文章</h2>
+                    <p class="text-secondary-emphasis mb-0">文章准备好后会在这里与大家见面。</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="article-pagination mt-5" aria-label="文章分页">
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
+                    {% if page_obj.has_previous %}
+                        <a class="btn btn-outline-light" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">上一页</a>
+                    {% endif %}
+                    <span>第 {{ page_obj.number }} 页，共 {{ page_obj.paginator.num_pages }} 页</span>
+                    {% if page_obj.has_next %}
+                        <a class="btn btn-outline-light" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">下一页</a>
+                    {% endif %}
+                </div>
+            </nav>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

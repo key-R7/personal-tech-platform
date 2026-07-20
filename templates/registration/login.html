@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}登录 | 个人技术平台{% endblock %}
+
+{% block content %}
+<section class="content-section py-5">
+    <div class="container py-lg-4">
+        <div class="article-detail mx-auto">
+            <p class="eyebrow mb-2">ACCOUNT</p>
+            <h1 class="display-5 fw-bold mb-4">登录</h1>
+
+            {% if form.errors %}
+                <div class="alert alert-danger" role="alert">用户名或密码不正确，请重新输入。</div>
+            {% endif %}
+
+            <form class="content-card p-4" method="post" action="{% url 'accounts:login' %}">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">用户名</label>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">密码</label>
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+                {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                <button class="btn btn-info" type="submit">登录</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

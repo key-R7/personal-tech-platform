@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}个人项目 | 个人技术平台{% endblock %}
+
+{% block content %}
+<section class="content-section py-5">
+    <div class="container py-lg-4">
+        <div class="mb-5">
+            <p class="eyebrow mb-2">PROJECTS</p>
+            <h1 class="display-5 fw-bold mb-3">个人项目</h1>
+            <p class="text-secondary-emphasis mb-0">展示我在编程学习和工程实践中完成或持续维护的项目。</p>
+        </div>
+
+        {% if projects %}
+            <div class="row g-4">
+                {% for project in projects %}
+                    <div class="col-md-6">
+                        <article class="content-card p-4 p-lg-5 h-100">
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="status-badge">{{ project.get_status_display }}</span>
+                                {% if project.featured %}<span class="featured-badge">精选</span>{% endif %}
+                            </div>
+                            <h2 class="h3 mb-3">
+                                <a class="card-title-link" href="{{ project.get_absolute_url }}">{{ project.title }}</a>
+                            </h2>
+                            <p class="text-secondary-emphasis">{{ project.summary }}</p>
+                            <p class="tech-stack mb-0">{{ project.tech_stack }}</p>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state p-5 text-center">
+                <h2 class="h4">暂时还没有可展示的项目</h2>
+                <p class="text-secondary-emphasis mb-0">项目完成后会在这里补充详细记录。</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+<footer class="site-footer py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-3">
+        <span>© {% now "Y" %} {{ site_profile.name }} · 使用 Python 与 Django 持续构建</span>
+        <span class="d-flex flex-wrap gap-3">
+            <a href="{{ site_profile.github_url }}" target="_blank" rel="noopener noreferrer">GitHub（待填写）</a>
+            <a href="mailto:{{ site_profile.email }}">{{ site_profile.email }}</a>
+        </span>
+    </div>
+</footer>

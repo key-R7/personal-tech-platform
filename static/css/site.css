@@ -1,0 +1,215 @@
+:root {
+    --site-bg: #070b17;
+    --site-surface: #10182b;
+    --site-border: rgba(148, 163, 184, 0.22);
+    --site-cyan: #51e5ff;
+    --site-purple: #8b5cf6;
+}
+
+html {
+    min-width: 320px;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #f8fafc;
+    background: var(--site-bg);
+    font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+a {
+    color: inherit;
+}
+
+.skip-link {
+    position: fixed;
+    z-index: 1100;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.75rem 1rem;
+    color: #050816;
+    background: var(--site-cyan);
+    border-radius: 0.5rem;
+}
+
+.site-navbar {
+    position: relative;
+    z-index: 10;
+    background: rgba(7, 11, 23, 0.92);
+    border-bottom: 1px solid var(--site-border);
+    backdrop-filter: blur(16px);
+}
+
+.navbar-brand {
+    letter-spacing: 0.12em;
+}
+
+.nav-link.active {
+    color: var(--site-cyan) !important;
+}
+
+.hero-section {
+    min-height: calc(82vh - 72px);
+    background:
+        radial-gradient(circle at 78% 34%, rgba(139, 92, 246, 0.28), transparent 31rem),
+        radial-gradient(circle at 28% 48%, rgba(81, 229, 255, 0.18), transparent 28rem),
+        linear-gradient(180deg, #070b17, #0b1020);
+}
+
+.content-section,
+.home-section {
+    background:
+        radial-gradient(circle at 85% 12%, rgba(139, 92, 246, 0.12), transparent 30rem),
+        linear-gradient(180deg, #070b17, #0b1020);
+}
+
+.content-section {
+    min-height: calc(100vh - 130px);
+}
+
+.home-section-alt {
+    background:
+        radial-gradient(circle at 18% 20%, rgba(81, 229, 255, 0.1), transparent 28rem),
+        #080d1a;
+}
+
+.eyebrow {
+    color: var(--site-cyan);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.building-message {
+    color: #cbd5e1;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+}
+
+.profile-introduction {
+    max-width: 46rem;
+    color: #cbd5e1;
+    line-height: 1.8;
+}
+
+.content-card,
+.article-card,
+.empty-state,
+.about-block {
+    background: rgba(16, 24, 43, 0.78);
+    border: 1px solid var(--site-border);
+    border-radius: 1rem;
+}
+
+.content-card {
+    transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.content-card:hover {
+    border-color: rgba(81, 229, 255, 0.48);
+    transform: translateY(-2px);
+}
+
+.about-block {
+    padding: 1.5rem;
+}
+
+.about-block p,
+.about-block li {
+    color: #cbd5e1;
+    line-height: 1.75;
+}
+
+.section-link,
+.card-title-link,
+.article-title-link,
+.back-link,
+.site-footer a {
+    color: #f8fafc;
+    text-decoration-color: rgba(81, 229, 255, 0.45);
+    text-underline-offset: 0.25em;
+}
+
+.section-link:hover,
+.section-link:focus-visible,
+.card-title-link:hover,
+.card-title-link:focus-visible,
+.article-title-link:hover,
+.article-title-link:focus-visible,
+.back-link:hover,
+.back-link:focus-visible,
+.site-footer a:hover,
+.site-footer a:focus-visible {
+    color: var(--site-cyan);
+}
+
+.article-date {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.status-badge,
+.featured-badge {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    color: var(--site-cyan);
+    background: rgba(81, 229, 255, 0.1);
+    border: 1px solid rgba(81, 229, 255, 0.28);
+}
+
+.featured-badge {
+    color: #d8c7ff;
+    background: rgba(139, 92, 246, 0.14);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.tech-stack {
+    color: #a9b8cc;
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.article-detail {
+    max-width: 48rem;
+}
+
+.article-content {
+    color: #dbe4f0;
+    font-size: 1.05rem;
+    line-height: 1.85;
+}
+
+.site-footer {
+    color: #94a3b8;
+    background: #050816;
+    border-top: 1px solid var(--site-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .content-card {
+        transition: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-section {
+        min-height: auto;
+    }
+
+    .display-2 {
+        font-size: clamp(3rem, 18vw, 4.5rem);
+    }
+}

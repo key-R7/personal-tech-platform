@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | 个人技术平台{% endblock %}
+
+{% block content %}
+<article class="content-section py-5">
+    <div class="container py-lg-4">
+        <div class="article-detail mx-auto">
+            <a class="back-link d-inline-block mb-4" href="{% url 'blog:article_list' %}">← 返回文章列表</a>
+            <header class="mb-5">
+                <time class="article-date" datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"Y年n月j日" }}</time>
+                <h1 class="display-5 fw-bold mt-2 mb-3">{{ article.title }}</h1>
+                <p class="lead text-secondary-emphasis mb-3">{{ article.summary }}</p>
+                <div class="article-taxonomy d-flex flex-wrap align-items-center gap-2">
+                    {% if article.category %}<a class="taxonomy-link" href="{% url 'blog:article_list' %}?category={{ article.category.slug|urlencode }}">分类：{{ article.category.name }}</a>{% endif %}
+                    {% for tag in article.tags.all %}<a class="taxonomy-link" href="{% url 'blog:article_list' %}?tag={{ tag.slug|urlencode }}">#{{ tag.name }}</a>{% endfor %}
+                </div>
+            </header>
+            <div class="article-content mb-5">{{ article.content|linebreaks }}</div>
+
+            <section aria-labelledby="comments-title">
+                <h2 id="comments-title" class="h3 mb-4">评论</h2>
+
+                {% if comments %}
+                    <div class="d-grid gap-3 mb-5">
+                        {% for comment in comments %}
+                            <article class="content-card p-4">
+                                <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                                    <strong>{{ comment.author.username }}</strong>
+                                    <time class="article-date" datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|date:"Y年n月j日 H:i" }}</time>
+                                </div>
+                                <p class="mb-3">{{ comment.content }}</p>
+                                {% if user == comment.author or user.is_staff %}
+                                    <form method="post" action="{% url 'blog:comment_delete' comment.pk %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">删除评论</button>
+                                    </form>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty-state p-4 mb-5">暂时还没有评论，欢迎发表第一条评论。</p>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <form class="content-card p-4" method="post" action="{% url 'blog:comment_create' article.slug %}">
+                        {% csrf_token %}
+                        <h3 class="h5 mb-3">发表评论</h3>
+                        {{ comment_form.non_field_errors }}
+                        <div class="mb-3">
+                            <label class="form-label" for="{{ comment_form.content.id_for_label }}">评论内容</label>
+                            {{ comment_form.content }}
+                            {{ comment_form.content.errors }}
+                        </div>
+                        <button class="btn btn-info" type="submit">提交评论</button>
+                    </form>
+                {% else %}
+                    <p class="content-card p-4 mb-0">
+                        请先<a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">登录</a>后发表评论。
+                    </p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</article>
+{% endblock %}
