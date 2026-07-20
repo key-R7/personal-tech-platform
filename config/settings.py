@@ -19,9 +19,34 @@ def required_environment_variable(name):
     return value
 
 
+def environment_boolean(name, default=False):
+    """Read a boolean environment variable using explicit accepted values."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+
+    normalized_value = value.strip().lower()
+    if normalized_value in {"1", "true", "yes", "on"}:
+        return True
+    if normalized_value in {"0", "false", "no", "off"}:
+        return False
+    raise ImproperlyConfigured(
+        f"Environment variable {name} must be a boolean value."
+    )
+
+
+def environment_list(name, default=""):
+    """Read a comma-separated environment variable as a clean list."""
+    value = os.getenv(name, default)
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 SECRET_KEY = required_environment_variable("DJANGO_SECRET_KEY")
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = environment_boolean("DJANGO_DEBUG", default=True)
+ALLOWED_HOSTS = environment_list(
+    "DJANGO_ALLOWED_HOSTS",
+    default="localhost,127.0.0.1,[::1]",
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -92,3 +117,32 @@ LOGIN_REDIRECT_URL = "core:home"
 LOGOUT_REDIRECT_URL = "core:home"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "{levelname} {asctime} {name}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "blog": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+}

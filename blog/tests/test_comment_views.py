@@ -265,10 +265,12 @@ class CommentDeleteTests(CommentViewTestData):
     def test_other_user_cannot_delete_comment(self):
         self.client.force_login(self.other_user)
 
-        response = self.client.post(self.delete_url(self.comment))
+        with self.assertLogs("blog.views", level="WARNING") as captured_logs:
+            response = self.client.post(self.delete_url(self.comment))
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Comment.objects.filter(pk=self.comment.pk).exists())
+        self.assertIn("attempted to delete comment", captured_logs.output[0])
 
     def test_staff_user_can_delete_any_comment(self):
         self.client.force_login(self.staff_user)

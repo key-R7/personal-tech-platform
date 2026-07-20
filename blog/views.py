@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -8,6 +10,8 @@ from django.views.decorators.http import require_POST
 
 from .forms import CommentForm
 from .models import Article, Category, Comment, Tag
+
+logger = logging.getLogger(__name__)
 
 
 def published_articles():
@@ -112,6 +116,12 @@ def comment_delete(request, pk):
         pk=pk,
     )
     if request.user != comment.author and not request.user.is_staff:
+        logger.warning(
+            "User %s attempted to delete comment %s owned by user %s",
+            request.user.pk,
+            comment.pk,
+            comment.author_id,
+        )
         return HttpResponseForbidden("你没有权限删除这条评论。")
 
     article = comment.article

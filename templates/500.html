@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}服务器暂时出现问题 | 个人技术平台{% endblock %}
+
+{% block content %}
+<section class="content-section py-5">
+    <div class="container py-lg-5 text-center">
+        <p class="eyebrow mb-2">500</p>
+        <h1 class="display-5 fw-bold mb-3">服务器暂时出现问题</h1>
+        <p class="text-secondary-emphasis mb-4">请稍后重试。错误详情已经记录，不会在页面中公开。</p>
+        <a class="btn btn-info" href="{% url 'core:home' %}">返回首页</a>
+    </div>
+</section>
+{% endblock %}
