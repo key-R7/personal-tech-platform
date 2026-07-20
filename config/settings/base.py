@@ -1,11 +1,11 @@
-"""Django settings for the personal technology platform."""
+"""Settings shared by development and production environments."""
 
 import os
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 def required_environment_variable(name):
@@ -13,14 +13,13 @@ def required_environment_variable(name):
     value = os.getenv(name)
     if not value:
         raise ImproperlyConfigured(
-            f"Missing required environment variable: {name}. "
-            "Set it in the current terminal before running Django."
+            f"Missing required environment variable: {name}."
         )
     return value
 
 
 def environment_boolean(name, default=False):
-    """Read a boolean environment variable using explicit accepted values."""
+    """Read a boolean without treating every non-empty string as true."""
     value = os.getenv(name)
     if value is None:
         return default
@@ -41,12 +40,54 @@ def environment_list(name, default=""):
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
-SECRET_KEY = required_environment_variable("DJANGO_SECRET_KEY")
-DEBUG = environment_boolean("DJANGO_DEBUG", default=True)
-ALLOWED_HOSTS = environment_list(
-    "DJANGO_ALLOWED_HOSTS",
-    default="localhost,127.0.0.1,[::1]",
-)
+def environment_port(name, default=None):
+    """Read and validate a TCP port from the environment."""
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        if default is None:
+            raise ImproperlyConfigured(
+                f"Missing required environment variable: {name}."
+            )
+        value = str(default)
+
+    try:
+        port = int(value)
+    except ValueError as exc:
+        raise ImproperlyConfigured(
+            f"Environment variable {name} must be an integer port."
+        ) from exc
+    if not 1 <= port <= 65535:
+        raise ImproperlyConfigured(
+            f"Environment variable {name} must be between 1 and 65535."
+        )
+    return port
+
+
+def database_from_environment(default_engine="sqlite"):
+    """Build a SQLite or PostgreSQL Django database configuration."""
+    engine = os.getenv("DATABASE_ENGINE", default_engine).strip().lower()
+
+    if engine in {"sqlite", "sqlite3"}:
+        database_name = os.getenv("DATABASE_NAME", "").strip()
+        return {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": database_name or BASE_DIR / "db.sqlite3",
+        }
+
+    if engine in {"postgres", "postgresql"}:
+        return {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": required_environment_variable("DATABASE_NAME"),
+            "USER": required_environment_variable("DATABASE_USER"),
+            "PASSWORD": required_environment_variable("DATABASE_PASSWORD"),
+            "HOST": required_environment_variable("DATABASE_HOST"),
+            "PORT": environment_port("DATABASE_PORT"),
+        }
+
+    raise ImproperlyConfigured(
+        "DATABASE_ENGINE must be either 'sqlite' or 'postgresql'."
+    )
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -89,13 +130,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

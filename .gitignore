@@ -1,9 +1,13 @@
 .venv/
+venv/
 .env
+.env.*
+!.env.example
 *.sqlite3
 __pycache__/
 *.py[cod]
 .coverage
+.coverage.*
 htmlcov/
 *.log
 staticfiles/
