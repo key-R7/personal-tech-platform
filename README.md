@@ -4,9 +4,9 @@
 
 > 使用Django服务端渲染构建的个人技术平台，覆盖内容管理、文章检索、项目展示、Session认证、评论权限、PostgreSQL、Docker与持续集成。
 
-当前状态：核心功能完成；本地SQLite、Docker PostgreSQL和GitHub Actions均已验证通过，正在准备Render公网部署。
+当前状态：核心功能完成；本地SQLite、Docker PostgreSQL、GitHub Actions和Render公网部署均已验证通过。
 
-[GitHub仓库](https://github.com/key-R7/personal-tech-platform) · [架构说明](docs/architecture.md) · [Render部署](docs/render-deployment.md) · [演示指南](docs/demo-guide.md) · [面试准备](docs/interview-notes.md)
+[在线演示](https://personal-tech-platform.onrender.com/) · [GitHub仓库](https://github.com/key-R7/personal-tech-platform) · [架构说明](docs/architecture.md) · [Render部署](docs/render-deployment.md) · [演示指南](docs/demo-guide.md) · [面试准备](docs/interview-notes.md)
 
 ## 项目截图
 
@@ -297,9 +297,11 @@ docker compose down -v
 
 本地Compose只是生产式运行验证，尚不包含Nginx、正式HTTPS、云服务器或备份方案。
 
-## Render公网部署准备
+## Render公网部署
 
 项目的Docker镜像可以直接用于Render Web Service：Gunicorn监听Render提供的`PORT`，入口脚本在启动前等待PostgreSQL、执行迁移和收集静态文件，再由WhiteNoise提供静态资源。
+
+当前公网地址为[personal-tech-platform.onrender.com](https://personal-tech-platform.onrender.com/)。首次部署已经验证Docker构建、PostgreSQL迁移、`collectstatic`、Gunicorn启动、桌面与390px手机布局、Admin登录页和自定义404页面。
 
 Render控制台的服务、数据库、环境变量、管理员创建和公网验收步骤见[Render部署清单](docs/render-deployment.md)。该文档只提供变量名称与填写规则，不包含真实密钥或数据库凭据。
 
@@ -332,7 +334,7 @@ python scripts/check_repository.py
 1. 使用 Python 3.12.13 和 PostgreSQL 18 服务安装 `requirements.txt`，检查已跟踪敏感文件、Django 配置、遗漏迁移，实际执行迁移并确认 `connection.vendor` 为 `postgresql`，收集生产静态文件后运行全部测试；
 2. 在测试通过后执行 `docker build --tag personal-tech-platform:test .`，只检查镜像构建，不推送镜像或部署。
 
-工作流只使用明确标注的临时 CI 密钥和数据库密码，不读取 `.env`。本地创建工作流并不等于 GitHub Actions 已通过；只有将代码推送到带有 `main` 分支的 GitHub 仓库后，才能在 Actions 页面看到真实结果。
+工作流只使用明确标注的临时CI密钥和数据库密码，不读取`.env`。当前`main`分支工作流已经在GitHub真实运行并通过，CI状态以README顶部徽章和仓库Actions页面为准。
 
 ## 安全设计
 
@@ -350,13 +352,12 @@ python scripts/check_repository.py
 
 ## 当前限制与下一步
 
-- 已在本地Docker Compose的PostgreSQL 18中验证连接、迁移和测试；尚未迁移个人SQLite数据，也未在云数据库验证。
+- 已在本地Docker Compose和Render PostgreSQL中验证连接与迁移，但没有把本地SQLite内容迁移到公网数据库；公网目前是空数据状态。
 - Bootstrap依赖CDN，离线环境样式可能不完整。
 - 尚未实现用户注册、评论回复/审核、图片上传和Markdown编辑器。
-- Docker Compose配置已加入，但仍未配置Nginx、正式HTTPS或云服务器部署。
-- Render部署配置已完成本地准备，但尚未在Render账户中真实构建或启动。
-- GitHub Actions工作流需要推送到GitHub后才能得到首次真实运行结果。
-- 个人资料已经按当前简历补充；GitHub地址仍需在公开仓库创建后补充。
+- Render Free Web Service无访问时会休眠，首次访问可能需要约一分钟唤醒。
+- Render Free PostgreSQL会在2026年8月21日到期并被删除，且不提供备份；长期公开展示前必须升级或迁移数据库。
+- 公网环境尚未创建管理员账号和正式展示内容，登录、评论及Admin写入流程仍需在创建账号后进行人工验收。
 - `seed_demo`仅用于本地界面验证，正式展示内容仍应由作者在Admin中维护。
 
-后续可以先把个人资料、真实文章和项目内容补充完整，再为正式部署准备托管PostgreSQL、HTTPS、备份和发布流程。本阶段不自动部署。
+下一步应安全创建公网管理员、录入真实文章与项目、完成登录和评论权限验收，并用公网内容重新拍摄README截图。不要在仓库、文档或聊天中记录管理员密码和数据库凭据。
