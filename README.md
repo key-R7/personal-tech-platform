@@ -1,8 +1,10 @@
 # 个人技术平台
 
+[![CI](https://github.com/key-R7/personal-tech-platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/key-R7/personal-tech-platform/actions/workflows/ci.yml)
+
 > 使用Django服务端渲染构建的个人技术平台，覆盖内容管理、文章检索、项目展示、Session认证、评论权限、PostgreSQL、Docker与持续集成。
 
-当前状态：核心功能完成；本地SQLite与Docker PostgreSQL验证通过；GitHub Actions首次运行发现生产静态文件收集顺序问题，修复正在等待下一次推送验证。
+当前状态：核心功能完成；本地SQLite、Docker PostgreSQL和GitHub Actions均已验证通过，正在准备Render公网部署。
 
 [GitHub仓库](https://github.com/key-R7/personal-tech-platform) · [架构说明](docs/architecture.md) · [Render部署](docs/render-deployment.md) · [演示指南](docs/demo-guide.md) · [面试准备](docs/interview-notes.md)
 
