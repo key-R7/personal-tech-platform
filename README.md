@@ -2,7 +2,7 @@
 
 > 使用Django服务端渲染构建的个人技术平台，覆盖内容管理、文章检索、项目展示、Session认证、评论权限、PostgreSQL、Docker与持续集成。
 
-当前状态：核心功能完成；本地SQLite与Docker PostgreSQL验证通过；GitHub Actions工作流已配置，等待推送后进行首次真实运行。
+当前状态：核心功能完成；本地SQLite与Docker PostgreSQL验证通过；GitHub Actions首次运行发现生产静态文件收集顺序问题，修复正在等待下一次推送验证。
 
 [GitHub仓库](https://github.com/key-R7/personal-tech-platform) · [架构说明](docs/architecture.md) · [Render部署](docs/render-deployment.md) · [演示指南](docs/demo-guide.md) · [面试准备](docs/interview-notes.md)
 
@@ -327,7 +327,7 @@ python scripts/check_repository.py
 
 持续集成包含两个 Job：
 
-1. 使用 Python 3.12.13 和 PostgreSQL 18 服务安装 `requirements.txt`，检查已跟踪敏感文件、Django 配置、遗漏迁移，实际执行迁移并确认 `connection.vendor` 为 `postgresql`，最后运行全部测试；
+1. 使用 Python 3.12.13 和 PostgreSQL 18 服务安装 `requirements.txt`，检查已跟踪敏感文件、Django 配置、遗漏迁移，实际执行迁移并确认 `connection.vendor` 为 `postgresql`，收集生产静态文件后运行全部测试；
 2. 在测试通过后执行 `docker build --tag personal-tech-platform:test .`，只检查镜像构建，不推送镜像或部署。
 
 工作流只使用明确标注的临时 CI 密钥和数据库密码，不读取 `.env`。本地创建工作流并不等于 GitHub Actions 已通过；只有将代码推送到带有 `main` 分支的 GitHub 仓库后，才能在 Actions 页面看到真实结果。

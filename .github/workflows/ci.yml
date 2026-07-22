@@ -82,6 +82,9 @@ jobs:
           assert connection.vendor == 'postgresql', connection.vendor;
           print('Database vendor:', connection.vendor)"
 
+      - name: Collect production static files
+        run: python manage.py collectstatic --noinput
+
       - name: Run test suite
         run: python manage.py test
 
