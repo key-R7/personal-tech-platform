@@ -4,7 +4,7 @@
 
 当前状态：核心功能完成；本地SQLite与Docker PostgreSQL验证通过；GitHub Actions工作流已配置，等待推送后进行首次真实运行。
 
-[架构说明](docs/architecture.md) · [演示指南](docs/demo-guide.md) · [面试准备](docs/interview-notes.md)
+[GitHub仓库](https://github.com/key-R7/personal-tech-platform) · [架构说明](docs/architecture.md) · [Render部署](docs/render-deployment.md) · [演示指南](docs/demo-guide.md) · [面试准备](docs/interview-notes.md)
 
 ## 项目截图
 
@@ -69,6 +69,7 @@ projects/            # 项目展示
 templates/           # 全局及页面模板
 static/              # CSS和favicon
 docs/architecture.md # 系统架构、权限与数据流
+docs/render-deployment.md # Render控制台配置与公网验收清单
 scripts/             # 轻量仓库检查脚本
 .github/workflows/   # GitHub Actions持续集成
 Dockerfile           # 生产式Django镜像
@@ -294,6 +295,12 @@ docker compose down -v
 
 本地Compose只是生产式运行验证，尚不包含Nginx、正式HTTPS、云服务器或备份方案。
 
+## Render公网部署准备
+
+项目的Docker镜像可以直接用于Render Web Service：Gunicorn监听Render提供的`PORT`，入口脚本在启动前等待PostgreSQL、执行迁移和收集静态文件，再由WhiteNoise提供静态资源。
+
+Render控制台的服务、数据库、环境变量、管理员创建和公网验收步骤见[Render部署清单](docs/render-deployment.md)。该文档只提供变量名称与填写规则，不包含真实密钥或数据库凭据。
+
 ## 内容管理、登录和评论
 
 项目没有开放注册。管理员通过 `/admin/` 创建用户和内容，普通用户使用 `/accounts/login/` 登录。
@@ -345,6 +352,7 @@ python scripts/check_repository.py
 - Bootstrap依赖CDN，离线环境样式可能不完整。
 - 尚未实现用户注册、评论回复/审核、图片上传和Markdown编辑器。
 - Docker Compose配置已加入，但仍未配置Nginx、正式HTTPS或云服务器部署。
+- Render部署配置已完成本地准备，但尚未在Render账户中真实构建或启动。
 - GitHub Actions工作流需要推送到GitHub后才能得到首次真实运行结果。
 - 个人资料已经按当前简历补充；GitHub地址仍需在公开仓库创建后补充。
 - `seed_demo`仅用于本地界面验证，正式展示内容仍应由作者在Admin中维护。

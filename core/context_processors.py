@@ -17,7 +17,7 @@ SITE_PROFILE = {
     ),
     "location": "哈尔滨",
     "email": "15840486398@163.com",
-    "github_url": "",
+    "github_url": "https://github.com/key-R7/personal-tech-platform",
     "experience_highlight": (
         "曾将某课程小组约4小时的英文文献批量整理工作压缩至15分钟，"
         "具备识别重复流程并将其标准化、自动化的意识与能力。"
