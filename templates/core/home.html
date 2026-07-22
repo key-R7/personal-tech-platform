@@ -5,24 +5,31 @@
 {% block content %}
 <section class="hero-section d-flex align-items-center">
     <div class="container py-5">
-        <div class="row align-items-center g-5">
+        <div class="row align-items-center">
             <div class="col-lg-8">
                 <p class="eyebrow mb-3">PYTHON · DJANGO · SOFTWARE ENGINEERING</p>
                 <h1 class="display-2 fw-bold mb-3">{{ site_profile.name }}</h1>
                 <p class="lead building-message mb-3">{{ site_profile.role }}</p>
                 <p class="fs-5 text-secondary-emphasis mb-4">{{ site_profile.direction }}</p>
                 <p class="profile-introduction mb-4">{{ site_profile.introduction }}</p>
+                <div class="profile-facts d-flex flex-wrap gap-2 mb-4" aria-label="个人概况">
+                    <span class="profile-fact">东北林业大学</span>
+                    <span class="profile-fact">{{ site_profile.location }}</span>
+                    <span class="profile-fact">CET-4 / CET-6</span>
+                </div>
                 <p class="mb-4">{{ site_profile.career_goal }}</p>
                 <div class="d-flex flex-wrap gap-3">
                     <a class="btn btn-info" href="{% url 'projects:project_list' %}">查看项目</a>
                     <a class="btn btn-outline-light" href="{% url 'core:about' %}">了解更多</a>
-                    <a
-                        class="btn btn-outline-light"
-                        href="{{ site_profile.github_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >GitHub（待填写）</a>
-                    <a class="btn btn-outline-light" href="mailto:{{ site_profile.email }}">联系我（待填写）</a>
+                    {% if site_profile.github_url %}
+                        <a
+                            class="btn btn-outline-light"
+                            href="{{ site_profile.github_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >GitHub</a>
+                    {% endif %}
+                    <a class="btn btn-outline-light" href="mailto:{{ site_profile.email }}">邮箱联系</a>
                 </div>
             </div>
         </div>

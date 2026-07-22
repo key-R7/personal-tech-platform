@@ -9,6 +9,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
 from config.settings.base import (
+    MIDDLEWARE,
+    STATIC_ROOT,
+    STORAGES,
     database_from_environment,
     environment_boolean,
     environment_list,
@@ -54,6 +57,17 @@ def settings_subprocess(module, extra_environment=None):
 
 
 class EnvironmentSettingTests(SimpleTestCase):
+    def test_production_static_files_have_collect_and_serving_configuration(self):
+        self.assertEqual(STATIC_ROOT.name, "staticfiles")
+        self.assertEqual(
+            MIDDLEWARE[1],
+            "whitenoise.middleware.WhiteNoiseMiddleware",
+        )
+        self.assertEqual(
+            STORAGES["staticfiles"]["BACKEND"],
+            "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        )
+
     def test_boolean_environment_values_are_parsed_explicitly(self):
         for value in ("1", "true", "YES", "on"):
             with self.subTest(value=value), patch.dict(
@@ -75,11 +89,11 @@ class EnvironmentSettingTests(SimpleTestCase):
     def test_comma_separated_environment_values_are_cleaned(self):
         with patch.dict(
             os.environ,
-            {"TEST_LIST": "localhost, 127.0.0.1, ,example.com"},
+            {"TEST_LIST": "localhost, 127.0.0.1, ,portfolio.test"},
         ):
             self.assertEqual(
                 environment_list("TEST_LIST"),
-                ["localhost", "127.0.0.1", "example.com"],
+                ["localhost", "127.0.0.1", "portfolio.test"],
             )
 
     def test_postgresql_configuration_uses_environment_fields(self):
@@ -126,7 +140,7 @@ class SettingsModuleTests(SimpleTestCase):
             "config.settings.production",
             {
                 "DJANGO_SECRET_KEY": "temporary-production-test-secret",
-                "DJANGO_ALLOWED_HOSTS": "portfolio.example.com",
+                "DJANGO_ALLOWED_HOSTS": "portfolio.test",
                 "DATABASE_ENGINE": "postgresql",
                 "DATABASE_NAME": "portfolio",
                 "DATABASE_USER": "portfolio_user",

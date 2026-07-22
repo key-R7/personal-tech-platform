@@ -17,7 +17,20 @@
 
             <section class="about-block mb-5" aria-labelledby="about-education">
                 <h2 id="about-education" class="h3">教育背景</h2>
-                <p class="mb-0">{{ site_profile.education }}</p>
+                <p>{{ site_profile.education }}</p>
+                <p class="mb-0">{{ site_profile.education_detail }}</p>
+            </section>
+
+            <section class="about-block mb-5" aria-labelledby="about-courses">
+                <h2 id="about-courses" class="h3">主修课程</h2>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for course in site_profile.courses %}<span class="profile-fact">{{ course }}</span>{% endfor %}
+                </div>
+            </section>
+
+            <section class="about-block mb-5" aria-labelledby="about-highlight">
+                <h2 id="about-highlight" class="h3">实践亮点</h2>
+                <p class="mb-0">{{ site_profile.experience_highlight }}</p>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-learning">
@@ -34,6 +47,18 @@
                 </ul>
             </section>
 
+            <section class="about-block mb-5" aria-labelledby="about-languages">
+                <h2 id="about-languages" class="h3">语言能力</h2>
+                <ul class="mb-0">
+                    {% for language in site_profile.languages %}<li>{{ language }}</li>{% endfor %}
+                </ul>
+            </section>
+
+            <section class="about-block mb-5" aria-labelledby="about-interests">
+                <h2 id="about-interests" class="h3">兴趣爱好</h2>
+                <p class="mb-0">{{ site_profile.interests|join:" · " }}</p>
+            </section>
+
             <section class="about-block mb-5" aria-labelledby="about-goal">
                 <h2 id="about-goal" class="h3">项目与求职目标</h2>
                 <p>{{ site_profile.career_goal }}</p>
@@ -43,12 +68,15 @@
             <section class="about-block" aria-labelledby="about-contact">
                 <h2 id="about-contact" class="h3">联系我</h2>
                 <div class="d-flex flex-wrap gap-3">
-                    <a
-                        href="{{ site_profile.github_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >GitHub（待填写）</a>
+                    {% if site_profile.github_url %}
+                        <a
+                            href="{{ site_profile.github_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >GitHub</a>
+                    {% endif %}
                     <a href="mailto:{{ site_profile.email }}">{{ site_profile.email }}</a>
+                    <span>{{ site_profile.location }}</span>
                 </div>
             </section>
         </div>

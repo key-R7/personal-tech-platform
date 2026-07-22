@@ -94,6 +94,17 @@ a {
     line-height: 1.8;
 }
 
+.profile-fact {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+    color: #dbeafe;
+    background: rgba(81, 229, 255, 0.08);
+    border: 1px solid rgba(81, 229, 255, 0.22);
+    border-radius: 999px;
+    font-size: 0.9rem;
+}
+
 .content-card,
 .article-card,
 .empty-state,

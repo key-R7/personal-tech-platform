@@ -141,3 +141,26 @@ class AboutAndNavigationTests(TestCase):
                 url = reverse(route_name)
                 self.assertEqual(url, expected_url)
                 self.assertEqual(self.client.get(url).status_code, 200)
+
+
+class ProfileContentTests(TestCase):
+    def test_home_displays_verified_resume_profile(self):
+        response = self.client.get(reverse("core:home"))
+
+        self.assertContains(response, "吴柯毅")
+        self.assertContains(response, "后端开发")
+        self.assertContains(response, "东北林业大学")
+        self.assertContains(response, "15840486398@163.com")
+
+    def test_about_displays_education_skills_and_languages(self):
+        response = self.client.get(reverse("core:about"))
+
+        self.assertContains(response, "2024年9月至今")
+        self.assertContains(response, "多Agent协作工作流")
+        self.assertContains(response, "CET-4、CET-6均通过")
+        self.assertContains(response, "英文文献批量整理工作压缩至15分钟")
+
+    def test_missing_github_url_does_not_render_placeholder_link(self):
+        response = self.client.get(reverse("core:home"))
+
+        self.assertNotContains(response, "GitHub（待填写）")

@@ -15,8 +15,8 @@ class ProjectViewTests(TestCase):
             summary="项目简介",
             description="项目详细介绍",
             tech_stack="Python、Django",
-            github_url="https://github.com/example/example-project",
-            demo_url="https://example.com",
+            github_url="https://github.test/demo/project",
+            demo_url="https://demo.test",
             status=Project.Status.MAINTAINING,
             featured=True,
         )
