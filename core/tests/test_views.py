@@ -9,6 +9,9 @@ from projects.models import Project
 
 
 class HomeViewTests(TestCase):
+    def setUp(self):
+        Project.objects.all().delete()
+
     def create_article(
         self,
         number,

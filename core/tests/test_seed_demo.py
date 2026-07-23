@@ -9,6 +9,9 @@ from projects.models import Project
 
 
 class SeedDemoCommandTests(TestCase):
+    def setUp(self):
+        Project.objects.all().delete()
+
     def run_command(self):
         output = StringIO()
         call_command("seed_demo", stdout=output)
