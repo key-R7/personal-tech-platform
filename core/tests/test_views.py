@@ -51,6 +51,26 @@ class HomeViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/home.html")
 
+    def test_home_starts_with_split_text_intro(self):
+        response = self.client.get(reverse("core:home"))
+
+        self.assertContains(response, 'aria-label="This is key !"')
+        self.assertContains(response, 'href="#profile-introduction"')
+        self.assertContains(response, 'id="profile-introduction"')
+        self.assertContains(response, 'rel="stylesheet"')
+        self.assertContains(response, "?v=20260724-2")
+        self.assertContains(response, "css/editorial")
+        self.assertContains(response, "js/site")
+
+    def test_home_uses_split_showcases_for_articles_and_projects(self):
+        self.create_article(1)
+        self.create_project(1, featured=True)
+
+        response = self.client.get(reverse("core:home"))
+
+        self.assertEqual(response.content.count(b"data-split-showcase"), 2)
+        self.assertContains(response, "split-card-tone-0")
+
     def test_home_shows_at_most_three_recent_articles(self):
         articles = [self.create_article(number) for number in range(4)]
 

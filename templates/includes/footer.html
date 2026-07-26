@@ -1,11 +1,12 @@
 <footer class="site-footer py-4">
-    <div class="container d-flex flex-column flex-md-row justify-content-between gap-3">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <span>© {% now "Y" %} {{ site_profile.name }} · 使用 Python 与 Django 持续构建</span>
         <span class="d-flex flex-wrap gap-3">
             {% if site_profile.github_url %}
                 <a href="{{ site_profile.github_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>
             {% endif %}
             <a href="mailto:{{ site_profile.email }}">{{ site_profile.email }}</a>
+            <a href="#page-top">返回顶部 ↑</a>
         </span>
     </div>
 </footer>
