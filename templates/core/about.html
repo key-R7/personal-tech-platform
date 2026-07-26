@@ -11,58 +11,58 @@
 
             <section class="about-block mb-5" aria-labelledby="about-introduction">
                 <h2 id="about-introduction" class="h3">个人简介</h2>
-                <p>{{ site_profile.role }}，{{ site_profile.direction }}。</p>
-                <p class="mb-0">{{ site_profile.introduction }}</p>
+                <p>{{ about_content.role }}，{{ about_content.direction }}。</p>
+                <p class="mb-0">{{ about_content.introduction }}</p>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-education">
                 <h2 id="about-education" class="h3">教育背景</h2>
-                <p>{{ site_profile.education }}</p>
-                <p class="mb-0">{{ site_profile.education_detail }}</p>
+                <p>{{ about_content.education }}</p>
+                <p class="mb-0">{{ about_content.education_detail }}</p>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-courses">
                 <h2 id="about-courses" class="h3">主修课程</h2>
                 <div class="d-flex flex-wrap gap-2">
-                    {% for course in site_profile.courses %}<span class="profile-fact">{{ course }}</span>{% endfor %}
+                    {% for course in about_content.courses %}<span class="profile-fact">{{ course }}</span>{% endfor %}
                 </div>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-highlight">
                 <h2 id="about-highlight" class="h3">实践亮点</h2>
-                <p class="mb-0">{{ site_profile.experience_highlight }}</p>
+                <p class="mb-0">{{ about_content.experience_highlight }}</p>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-learning">
                 <h2 id="about-learning" class="h3">当前学习方向</h2>
                 <ul class="mb-0">
-                    {% for topic in site_profile.learning_topics %}<li>{{ topic }}</li>{% endfor %}
+                    {% for topic in about_content.learning_topics %}<li>{{ topic }}</li>{% endfor %}
                 </ul>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-skills">
                 <h2 id="about-skills" class="h3">技术能力</h2>
                 <ul class="mb-0">
-                    {% for skill in site_profile.skills %}<li>{{ skill }}</li>{% endfor %}
+                    {% for skill in about_content.skills %}<li>{{ skill }}</li>{% endfor %}
                 </ul>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-languages">
                 <h2 id="about-languages" class="h3">语言能力</h2>
                 <ul class="mb-0">
-                    {% for language in site_profile.languages %}<li>{{ language }}</li>{% endfor %}
+                    {% for language in about_content.languages %}<li>{{ language }}</li>{% endfor %}
                 </ul>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-interests">
                 <h2 id="about-interests" class="h3">兴趣爱好</h2>
-                <p class="mb-0">{{ site_profile.interests|join:" · " }}</p>
+                <p class="mb-0">{{ about_content.interests|join:" · " }}</p>
             </section>
 
             <section class="about-block mb-5" aria-labelledby="about-goal">
                 <h2 id="about-goal" class="h3">项目与求职目标</h2>
-                <p>{{ site_profile.career_goal }}</p>
-                <p class="mb-0">通过这个平台持续展示文章、项目与学习成果，并建立完整的软件工程实践经验。</p>
+                <p>{{ about_content.career_goal }}</p>
+                <p class="mb-0">{{ about_content.project_goal }}</p>
             </section>
 
             <section class="about-block" aria-labelledby="about-contact">
