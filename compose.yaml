@@ -37,11 +37,14 @@ services:
       CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
       DJANGO_HTTPS_ENABLED: ${DJANGO_HTTPS_ENABLED:-false}
       DJANGO_TRUST_PROXY_HEADER: ${DJANGO_TRUST_PROXY_HEADER:-false}
+      DJANGO_SERVE_MEDIA: ${DJANGO_SERVE_MEDIA:-true}
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "${WEB_PORT:-8000}:8000"
+    volumes:
+      - media_data:/app/media
     healthcheck:
       test:
         - CMD
@@ -55,3 +58,4 @@ services:
 
 volumes:
   postgres_data:
+  media_data:

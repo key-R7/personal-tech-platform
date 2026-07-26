@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{% if feed_type == "personal" %}个人主页{% else %}圈{% endif %} | {{ site_profile.name }}{% endblock %}
+
+{% block content %}
+<section class="content-section py-5">
+    <div class="container py-lg-4">
+        <div class="social-feed mx-auto">
+            <header class="mb-4">
+                <p class="eyebrow mb-2">SOCIAL FEED</p>
+                {% if feed_type == "personal" %}
+                    <h1 class="display-5 fw-bold mb-3">个人主页</h1>
+                    <p class="text-secondary-emphasis mb-0">记录站点管理员发布的学习进展与技术动态。</p>
+                {% else %}
+                    <h1 class="display-5 fw-bold mb-3">圈</h1>
+                    <p class="text-secondary-emphasis mb-0">登录用户可以分享学习进度、交流技术实践。</p>
+                {% endif %}
+            </header>
+
+            {% if feed_type == "circle" %}
+                {% if user.is_authenticated %}
+                    <section class="social-composer p-4 mb-4" aria-labelledby="circle-composer-title">
+                        <h2 id="circle-composer-title" class="h4 mb-3">发布动态</h2>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ post_form.non_field_errors }}
+                            <div class="mb-3">
+                                {{ post_form.content.label_tag }}
+                                {{ post_form.content }}
+                                {{ post_form.content.errors }}
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    {{ post_form.image.label_tag }}
+                                    {{ post_form.image }}
+                                    <div class="form-text">JPG、PNG或WebP，最大5MB。</div>
+                                    {{ post_form.image.errors }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ post_form.video.label_tag }}
+                                    {{ post_form.video }}
+                                    <div class="form-text">MP4或WebM，最大50MB。</div>
+                                    {{ post_form.video.errors }}
+                                </div>
+                            </div>
+                            <p class="form-text mt-3">图片和视频只能选择一种；文字、图片或视频至少填写一项。</p>
+                            <button class="btn btn-info" type="submit">发布到圈</button>
+                        </form>
+                    </section>
+                {% else %}
+                    <div class="empty-state p-4 mb-4">
+                        <a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">登录</a>后可以发布圈动态。
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if posts %}
+                <div class="d-grid gap-4">
+                    {% for post in posts %}
+                        {% include "social/includes/post_card.html" %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state p-4">
+                    {% if feed_type == "personal" %}
+                        暂时还没有个人主页动态。
+                    {% else %}
+                        圈里暂时还没有动态，登录后可以发布第一条。
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="mt-4" aria-label="社交动态分页">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一页</a></li>
+                        {% endif %}
+                        <li class="page-item disabled"><span class="page-link">第{{ page_obj.number }}页，共{{ page_obj.paginator.num_pages }}页</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">下一页</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

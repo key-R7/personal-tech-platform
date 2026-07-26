@@ -16,8 +16,22 @@
         <div class="collapse navbar-collapse" id="primaryNavigation">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                 <li class="nav-item"><a class="nav-link{% if current_namespace == 'core' and current_url == 'home' %} active{% endif %}" href="{% url 'core:home' %}">首页</a></li>
-                <li class="nav-item"><a class="nav-link{% if current_namespace == 'blog' %} active{% endif %}" href="{% url 'blog:article_list' %}">文章</a></li>
-                <li class="nav-item"><a class="nav-link{% if current_namespace == 'projects' %} active{% endif %}" href="{% url 'projects:project_list' %}">项目</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_namespace == 'blog' %} active{% endif %}" href="{% url 'blog:article_list' %}">专业文章</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_namespace == 'projects' %} active{% endif %}" href="{% url 'projects:project_list' %}">个人项目</a></li>
+                <li class="nav-item dropdown">
+                    <a
+                        class="nav-link dropdown-toggle{% if current_namespace == 'social' %} active{% endif %}"
+                        href="#"
+                        id="socialNavigation"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >社交</a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="socialNavigation">
+                        <li><a class="dropdown-item" href="{% url 'social:personal_feed' %}">个人主页</a></li>
+                        <li><a class="dropdown-item" href="{% url 'social:circle_feed' %}">圈</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item"><a class="nav-link{% if current_namespace == 'core' and current_url == 'about' %} active{% endif %}" href="{% url 'core:about' %}">关于我</a></li>
                 <li class="nav-item"><a class="nav-link{% if current_namespace == 'admin' %} active{% endif %}" href="{% url 'admin:index' %}">管理后台</a></li>
                 {% if user.is_authenticated %}

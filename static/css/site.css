@@ -108,7 +108,9 @@ a {
 .content-card,
 .article-card,
 .empty-state,
-.about-block {
+.about-block,
+.social-composer,
+.social-post {
     background: rgba(16, 24, 43, 0.78);
     border: 1px solid var(--site-border);
     border-radius: 1rem;
@@ -191,6 +193,34 @@ a {
 
 .article-detail {
     max-width: 48rem;
+}
+
+.social-feed {
+    max-width: 52rem;
+}
+
+.social-post-content {
+    color: #dbe4f0;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+}
+
+.social-media {
+    max-height: 34rem;
+    object-fit: contain;
+    background: #050816;
+    border: 1px solid var(--site-border);
+    border-radius: 0.75rem;
+}
+
+.social-comment + .social-comment {
+    border-top: 1px solid var(--site-border);
+}
+
+.errorlist {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+    color: #fca5a5;
 }
 
 .article-content {

@@ -9,7 +9,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
 from config.settings.base import (
+    MEDIA_ROOT,
+    MEDIA_URL,
     MIDDLEWARE,
+    SERVE_MEDIA,
     STATIC_ROOT,
     STORAGES,
     database_from_environment,
@@ -22,6 +25,7 @@ CONFIGURATION_VARIABLES = (
     "DJANGO_SECRET_KEY",
     "DJANGO_DEBUG",
     "DJANGO_ALLOWED_HOSTS",
+    "DJANGO_SERVE_MEDIA",
     "DATABASE_ENGINE",
     "DATABASE_NAME",
     "DATABASE_USER",
@@ -39,9 +43,10 @@ def settings_subprocess(module, extra_environment=None):
     environment.update(extra_environment or {})
     command = (
         "import json; "
-        f"from {module} import ALLOWED_HOSTS, DATABASES, DEBUG; "
+        f"from {module} import ALLOWED_HOSTS, DATABASES, DEBUG, SERVE_MEDIA; "
         "print(json.dumps({"
         "'debug': DEBUG, "
+        "'serve_media': SERVE_MEDIA, "
         "'allowed_hosts': ALLOWED_HOSTS, "
         "'database': DATABASES['default']"
         "}, default=str))"
@@ -57,6 +62,11 @@ def settings_subprocess(module, extra_environment=None):
 
 
 class EnvironmentSettingTests(SimpleTestCase):
+    def test_media_files_have_explicit_local_configuration(self):
+        self.assertEqual(MEDIA_URL, "media/")
+        self.assertEqual(MEDIA_ROOT.name, "media")
+        self.assertIsInstance(SERVE_MEDIA, bool)
+
     def test_production_static_files_have_collect_and_serving_configuration(self):
         self.assertEqual(STATIC_ROOT.name, "staticfiles")
         self.assertEqual(
@@ -123,6 +133,7 @@ class SettingsModuleTests(SimpleTestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         configuration = json.loads(result.stdout)
         self.assertTrue(configuration["debug"])
+        self.assertFalse(configuration["serve_media"])
         self.assertEqual(
             configuration["database"]["ENGINE"],
             "django.db.backends.sqlite3",

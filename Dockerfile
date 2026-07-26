@@ -14,7 +14,8 @@ RUN addgroup --system django \
     && adduser --system --home /home/django --ingroup django django \
     && mkdir -p /home/django \
     && mkdir -p /app/staticfiles \
-    && chown -R django:django /home/django /app/staticfiles
+    && mkdir -p /app/media \
+    && chown -R django:django /home/django /app/staticfiles /app/media
 
 COPY --chown=django:django . .
 RUN chmod +x /app/docker/entrypoint.sh

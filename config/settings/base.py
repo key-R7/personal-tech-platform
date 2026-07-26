@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "core",
     "blog",
     "projects",
+    "social",
 ]
 
 MIDDLEWARE = [
@@ -147,6 +148,9 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+SERVE_MEDIA = environment_boolean("DJANGO_SERVE_MEDIA", default=False)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -184,6 +188,11 @@ LOGGING = {
             "propagate": False,
         },
         "blog": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "social": {
             "handlers": ["console"],
             "level": "WARNING",
             "propagate": False,
