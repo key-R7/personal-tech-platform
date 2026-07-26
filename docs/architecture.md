@@ -47,6 +47,11 @@ erDiagram
     ARTICLE }o--o{ TAG : tagged_with
     USER ||--o{ COMMENT : writes
     ARTICLE ||--o{ COMMENT : receives
+    USER ||--o{ SOCIAL_POST : publishes
+    SOCIAL_POST ||--o{ SOCIAL_COMMENT : receives
+    USER ||--o{ SOCIAL_COMMENT : writes
+    SOCIAL_POST ||--o{ SOCIAL_LIKE : receives
+    USER ||--o{ SOCIAL_LIKE : creates
 
     ARTICLE {
         string title
@@ -64,9 +69,25 @@ erDiagram
         text content
         datetime created_at
     }
+    SOCIAL_POST {
+        string feed_type
+        text content
+        file image
+        file video
+        datetime created_at
+    }
+    SOCIAL_COMMENT {
+        text content
+        datetime created_at
+    }
+    SOCIAL_LIKE {
+        datetime created_at
+    }
 ```
 
-`Project` 当前是独立展示模型，不与文章或用户建立关系。
+`Project` 当前是独立展示模型，不与文章或用户建立关系。`SocialPost`使用统一模型并以`feed_type`隔离Personal Feed和Circle Feed；`SocialLike`对`post + user`设置唯一约束。
+
+首页和About分别使用`HomePageContent`与`AboutPageContent`单例式配置模型。Admin保存后页面读取数据库最新内容；没有记录时回退到已核实的静态个人资料。
 
 ## 文章公开规则
 
@@ -120,6 +141,15 @@ flowchart TD
 
 GET 不会删除评论；权限在 View 中执行，不能通过隐藏或伪造前端按钮绕过。
 
+## 社交动态数据流与权限
+
+- Personal Feed只查询`feed_type=personal`，首版只允许staff通过Admin创建；
+- Circle Feed只查询`feed_type=circle`，登录用户通过ModelForm提交；
+- View忽略客户端的`author`和`feed_type`，分别固定为`request.user`和`circle`；
+- 点赞、评论、删除全部使用POST，游客跳转登录；
+- 动态或评论作者只能删除自己的内容，staff可以删除任意内容，越权返回403；
+- Feed使用`select_related("author")`、评论预取、聚合计数和`Exists`标记当前用户点赞状态，避免逐条查询。
+
 ## 配置与环境差异
 
 | 项目 | 本地开发 | Docker / 生产式运行 |
@@ -130,12 +160,15 @@ GET 不会删除评论；权限在 View 中执行，不能通过隐藏或伪造�
 | `DEBUG` | 默认 `True` | 始终 `False` |
 | 密钥 | 明确标注的开发默认值或环境变量 | 必须由环境变量提供 |
 | 静态文件 | Django 开发服务 | `collectstatic` + WhiteNoise |
+| 上传媒体 | `MEDIA_ROOT` + 开发媒体路由 | Compose命名卷；公网需持久磁盘或对象存储 |
 
 `base.py` 定义环境变量解析和公共配置；`development.py` 与 `production.py` 负责环境差异。生产设置缺少关键变量、尝试启用 DEBUG 或尝试回退 SQLite 时会明确失败。
 
 ## 容器启动流程
 
-`compose.yaml` 先启动 `db` 并等待健康检查。`web` 的入口脚本再有限重试数据库连接，依次执行 `migrate`、`collectstatic`，最后通过 `exec` 启动 Gunicorn。PostgreSQL 数据存放在命名卷中，普通 `docker compose down` 会保留它；`docker compose down -v` 会永久删除该卷。
+`compose.yaml` 先启动 `db` 并等待健康检查。`web` 的入口脚本再有限重试数据库连接，依次执行 `migrate`、`collectstatic`，最后通过 `exec` 启动 Gunicorn。PostgreSQL与上传媒体分别存放在命名卷中，普通`docker compose down`会保留它们；`docker compose down -v`会永久删除两个卷。
+
+Render当前没有持久化`/app/media`。在未挂载持久磁盘或接入对象存储前，公网容器重启或重新部署会丢失上传文件。
 
 ## GitHub Actions 检查流程
 

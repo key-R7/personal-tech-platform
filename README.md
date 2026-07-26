@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/key-R7/personal-tech-platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/key-R7/personal-tech-platform/actions/workflows/ci.yml)
 
-> 使用Django服务端渲染构建的个人技术平台，覆盖内容管理、文章检索、项目展示、Session认证、评论权限、PostgreSQL、Docker与持续集成。
+> 使用Django服务端渲染构建的个人技术平台，覆盖内容管理、文章检索、项目展示、社交动态、Session认证、权限控制、PostgreSQL、Docker与持续集成。
 
 当前状态：核心功能完成；本地SQLite、Docker PostgreSQL、GitHub Actions和Render公网部署均已验证通过。
 
@@ -33,7 +33,9 @@
 - 首页、About 页面、统一导航和页脚
 - 文章列表、详情、分类、标签、关键词搜索和分页
 - 项目列表、详情和精选项目
+- Personal Feed、Circle Feed、点赞、评论和单媒体动态
 - Django Admin 内容管理
+- 通过Admin维护首页和About内容
 - Django 内置登录和安全的 POST 退出
 - 评论创建、作者删除和 staff 管理权限
 - 自定义 404、500 页面和控制台日志
@@ -51,6 +53,7 @@
 - PostgreSQL + Psycopg 3（可选配置）
 - Django 内置测试框架
 - Gunicorn + WhiteNoise
+- Pillow（图片格式验证）
 - Docker Compose
 - GitHub Actions
 
@@ -68,6 +71,7 @@ config/
 core/                # 首页、About、认证URL和公共上下文
 blog/                # 文章、分类、标签和评论
 projects/            # 项目展示
+social/              # Personal Feed、Circle Feed、点赞、评论和媒体上传
 templates/           # 全局及页面模板
 static/              # CSS和favicon
 docs/architecture.md # 系统架构、权限与数据流
@@ -89,6 +93,9 @@ manage.py            # Django管理命令入口
 - `Article` 与 `Tag` 是多对多关系；
 - Django `User` 和 `Article` 分别一对多关联 `Comment`；
 - `Project` 是独立的作品展示模型，通过 `featured` 控制首页精选展示。
+- `SocialPost` 使用`feed_type`区分Personal Feed和Circle Feed；
+- `SocialComment`和`SocialLike`分别关联动态，点赞由数据库唯一约束防止重复；
+- `HomePageContent`和`AboutPageContent`各自最多保存一条有效页面配置。
 
 更完整的运行关系、请求流程、登录 Session、评论权限和 CI 流程见[架构文档](docs/architecture.md)。
 
@@ -157,6 +164,8 @@ python manage.py runserver
 - 首页：<http://127.0.0.1:8000/>
 - 文章：<http://127.0.0.1:8000/articles/>
 - 项目：<http://127.0.0.1:8000/projects/>
+- 个人主页动态：<http://127.0.0.1:8000/social/personal/>
+- 圈：<http://127.0.0.1:8000/social/circle/>
 - About：<http://127.0.0.1:8000/about/>
 - 登录：<http://127.0.0.1:8000/accounts/login/>
 - 管理后台：<http://127.0.0.1:8000/admin/>
@@ -272,6 +281,8 @@ docker compose exec web python manage.py createsuperuser
 
 `collectstatic` 将源码静态资源和Admin静态资源收集到镜像内的 `staticfiles` 目录，WhiteNoise在没有Nginx的本阶段负责提供压缩、带内容哈希的静态文件。正式高流量部署仍建议由反向代理、CDN或对象存储提供静态资源。
 
+Compose为`/app/media`配置了独立的`media_data`命名卷，并通过`DJANGO_SERVE_MEDIA=true`让Django在本地Compose演示环境提供媒体文件。普通执行`docker compose down`会保留PostgreSQL数据和上传媒体；`docker compose down -v`会同时删除这两个命名卷。这个Django媒体路由不适合高流量公网生产环境。
+
 停止服务但保留PostgreSQL命名卷：
 
 ```powershell
@@ -303,16 +314,27 @@ docker compose down -v
 
 当前公网地址为[personal-tech-platform.onrender.com](https://personal-tech-platform.onrender.com/)。首次部署已经验证Docker构建、PostgreSQL迁移、`collectstatic`、Gunicorn启动、桌面与390px手机布局、Admin登录页和自定义404页面。
 
+**媒体持久化限制**：当前Render服务没有在仓库配置中声明持久磁盘，容器本地`/app/media`会在重启或重新部署后丢失。正式启用公网图片/视频上传前，必须在Render挂载持久磁盘到`/app/media`，或改用S3兼容对象存储。WhiteNoise只负责静态文件，不负责永久保存用户上传媒体。
+
 Render控制台的服务、数据库、环境变量、管理员创建和公网验收步骤见[Render部署清单](docs/render-deployment.md)。该文档只提供变量名称与填写规则，不包含真实密钥或数据库凭据。
 
 ## 内容管理、登录和评论
 
 项目没有开放注册。管理员通过 `/admin/` 创建用户和内容，普通用户使用 `/accounts/login/` 登录。
 
+- 首页和About各使用一个单例式内容模型；Admin修改后前台立即读取数据库内容，没有记录时回退到仓库中已核实的个人资料。
 - 评论作者来自 `request.user`，文章来自服务端URL，客户端不能伪造。
 - 评论创建、删除和退出只接受 POST，并启用 CSRF 防护。
 - 普通用户只能删除自己的评论，staff 可以删除任意评论。
 - 评论使用 Django 默认模板转义，避免脚本注入。
+
+社交栏目同样不开放匿名写入：
+
+- Personal Feed只展示`feed_type=personal`的动态，由staff在Admin发布；
+- Circle Feed只展示`feed_type=circle`的动态，登录用户可通过服务端表单发布；
+- 动态作者和`feed_type`由View确定，不接受客户端指定；
+- 点赞、评论及删除均只接受POST，普通用户只能删除自己的内容，staff可删除任意内容；
+- 每条动态最多上传一张JPG/JPEG/PNG/WebP图片（5MB）或一个MP4/WebM视频（50MB），不能同时上传。
 
 ## 检查和测试
 
@@ -342,19 +364,24 @@ python scripts/check_repository.py
 - 评论作者来自 `request.user`，文章来自服务端 slug 查询，客户端不能指定；
 - 评论创建、删除和退出只接受 POST，并由 CSRF 中间件保护；
 - 普通用户只能删除自己的评论，staff 可管理全部评论，权限在服务端检查；
+- 社交动态的作者和类型由服务端绑定，点赞使用数据库唯一约束；
+- 上传文件同时校验扩展名、基础MIME类型、大小和图片有效性，并使用UUID文件名；
 - Django 模板默认转义用户内容，当前没有对评论正文使用 `safe`；
 - 生产设置拒绝 `DEBUG=True` 和 SQLite 回退，并要求密钥、主机与 PostgreSQL 参数；
 - `.gitignore` 与 `.dockerignore` 排除 `.env`、数据库、日志、虚拟环境、媒体和 `staticfiles`；CI 再检查这些路径是否被 Git 跟踪。
 
 ## 修改个人资料内容
 
-首页、About页面和页脚共用的个人资料位于`core/context_processors.py`中的`SITE_PROFILE`。当前姓名、教育背景、技能方向、语言能力和邮箱来自作者简历；未提供的GitHub地址不会渲染为空链接，出生日期和手机号不进入公开仓库。
+管理员可在Django Admin中的“首页内容”和“关于我内容”修改前台文案。两个模型各自最多保留一条记录，模板保持默认转义，不接受任意HTML。迁移会写入当前已经核实的个人资料；记录不存在时，页面回退到`core/context_processors.py`中的`SITE_PROFILE`，不会显示空白页面。
+
+姓名、邮箱、所在地和GitHub等跨页面共享信息仍位于`core/context_processors.py`。未提供的链接不会渲染为空链接，出生日期和手机号不进入公开仓库。
 
 ## 当前限制与下一步
 
 - 已在本地Docker Compose和Render PostgreSQL中验证连接与迁移，但没有把本地SQLite内容迁移到公网数据库；公网目前是空数据状态。
 - Bootstrap依赖CDN，离线环境样式可能不完整。
-- 尚未实现用户注册、评论回复/审核、图片上传和Markdown编辑器。
+- 尚未实现用户注册、评论回复/审核、动态编辑、多媒体上传、视频转码和Markdown编辑器。
+- Render当前没有持久媒体磁盘或对象存储，公网上传文件在重新部署后可能丢失。
 - Render Free Web Service无访问时会休眠，首次访问可能需要约一分钟唤醒。
 - Render Free PostgreSQL会在2026年8月21日到期并被删除，且不提供备份；长期公开展示前必须升级或迁移数据库。
 - 公网环境尚未创建管理员账号和正式展示内容，登录、评论及Admin写入流程仍需在创建账号后进行人工验收。
